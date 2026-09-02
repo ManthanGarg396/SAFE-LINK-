@@ -1,0 +1,7 @@
+{
+  "name": "SAFE-LINK AI",
+  "description": "Multimodal Campus Health & Emergency Safety Companion powered by Gemini AI. Provides instant structured first-aid guidance, multilingual translation, hazard detection, and emergency contact alerts.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
