@@ -31,6 +31,20 @@ export const HomePage: React.FC<HomePageProps> = ({
   onOpenEmergencyModal,
   onSelectDemoScenario,
 }) => {
+  const [broadcast, setBroadcast] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setBroadcast(localStorage.getItem('safelink_global_broadcast'));
+
+    const handleStorageChange = () => {
+      setBroadcast(localStorage.getItem('safelink_global_broadcast'));
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const quickCategories = [
     {
       title: 'Minor Injury & Cuts',
@@ -82,6 +96,28 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   return (
     <div className="space-y-12 pb-16 animate-in fade-in duration-300">
+      {broadcast && (
+        <div className="p-4 rounded-2xl bg-amber-500 border-2 border-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md flex items-start justify-between gap-3 animate-pulse">
+          <div className="flex items-start gap-2">
+            <span className="text-lg">📢</span>
+            <div className="space-y-1">
+              <div className="font-extrabold uppercase tracking-wider text-slate-900 text-[10px]">
+                Active Campus Responder Alert Broadcast
+              </div>
+              <p className="font-semibold leading-snug">{broadcast}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setBroadcast(null);
+            }}
+            className="p-1 rounded bg-slate-950/10 hover:bg-slate-950/20 text-slate-950 text-xs font-bold shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* HERO SECTION */}
       <section className="relative rounded-3xl bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white p-6 sm:p-10 lg:p-12 shadow-2xl overflow-hidden border border-slate-800">
         {/* Background ambient lighting */}
@@ -297,15 +333,15 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* JUDGE-FRIENDLY: "WHY SAFE-LINK AI?" VALUE PILLARS */}
       <section className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="max-w-2xl space-y-1">
+        <div className="max-w-3xl space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider">
-            <span>✨ Judge Feature Showcase</span>
+            <span>FEATURE SHOWCASE</span>
           </div>
           <h2 className="text-2xl font-extrabold font-display text-slate-900 tracking-tight">
             Why Safe-Link AI?
           </h2>
-          <p className="text-xs text-slate-500">
-            Engineered specifically for the Google for Developers | H2S PromptWars × WIE-IEEE {`{ Build with AI }`} Challenge
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Safe-Link AI provides fast, accessible, and structured safety guidance when people need help during campus emergencies. It combines Gemini-powered text and image analysis with multilingual translation, voice assistance, and emergency contact support. By connecting understand, assist, and respond in one platform, Safe-Link AI helps users make safer decisions and reach the right help faster.
           </p>
         </div>
 

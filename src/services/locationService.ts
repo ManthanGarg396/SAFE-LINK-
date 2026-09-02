@@ -45,15 +45,19 @@ export const LocationService = {
           });
         },
         (error) => {
-          console.warn('Geolocation error or denied:', error.message);
-          // Return realistic campus fallback coordinates with clear indication
-          resolve({
-            latitude: 28.5458,
-            longitude: 77.1932,
-            accuracy: 25,
-            campusZone: 'Central Science & Chemistry Block (C)',
-            timestamp: Date.now(),
-          });
+          let message = 'An unknown error occurred';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              message = 'Location access was denied. Please enable location permissions in your browser settings to use this feature.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = 'Location information is unavailable.';
+              break;
+            case error.TIMEOUT:
+              message = 'The request to get user location timed out.';
+              break;
+          }
+          reject(new Error(message));
         },
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
       );

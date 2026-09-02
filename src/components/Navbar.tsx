@@ -45,151 +45,206 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showDemoMenu, setShowDemoMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isVoiceListening, setIsVoiceListening] = useState(false);
+
+  const startVoiceCommandListener = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Hands-free voice recognition is not supported in this browser.');
+      return;
+    }
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.continuous = true;
+    rec.interimResults = false;
+
+    rec.onstart = () => {
+      setIsVoiceListening(true);
+    };
+
+    rec.onresult = (event: any) => {
+      const lastResultIdx = event.results.length - 1;
+      const transcript = event.results[lastResultIdx][0].transcript.toLowerCase();
+      console.log('Voice Command recognized:', transcript);
+      if (transcript.includes('help me') || transcript.includes('emergency help') || transcript.includes('sos') || transcript.includes('help')) {
+        onOpenEmergencyModal();
+        setIsVoiceListening(false);
+        rec.stop();
+      }
+    };
+
+    rec.onerror = () => {
+      setIsVoiceListening(false);
+    };
+
+    rec.onend = () => {
+      setIsVoiceListening(false);
+    };
+
+    (window as any)._global_rec = rec;
+    rec.start();
+  };
+
+  const stopVoiceCommandListener = () => {
+    if ((window as any)._global_rec) {
+      try {
+        (window as any)._global_rec.stop();
+      } catch (e) {}
+    }
+    setIsVoiceListening(false);
+  };
 
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLanguage) || LANGUAGES[0];
 
   const navLinks: Array<{ id: AppTab; label: string; icon: string }> = [
     { id: 'home', label: 'Dashboard', icon: '🏠' },
     { id: 'assistant', label: 'AI Assistant', icon: '🤖' },
-    { id: 'hazard-vision', label: 'Hazard Vision', icon: '📷' },
-    { id: 'translate', label: 'Translate Signs', icon: '🌐' },
-    { id: 'chat', label: 'Safety Chat', icon: '💬' },
+    { id: 'scan', label: 'Hazard Scanner', icon: '🔍' },
     { id: 'map', label: 'Campus Map', icon: '🗺️' },
-    { id: 'first-aid', label: 'First-Aid Library', icon: '📚' },
-    { id: 'contacts', label: 'Contacts', icon: '👥' },
-    { id: 'history', label: 'History', icon: '📜' },
-    { id: 'about', label: 'About', icon: 'ℹ️' },
+    { id: 'medical', label: 'Medical Help', icon: '🏥' },
+    { id: 'guardian', label: 'Guardian', icon: '🛡️' },
+    { id: 'admin', label: 'Command Center', icon: '📊' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' },
+    { id: 'demo', label: 'Scenario Center', icon: '🎮' },
+    { id: 'first-aid', label: 'First-Aid', icon: '📚' },
   ];
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
-      {/* Top micro-bar for Hackathon / Status */}
-      <div className="bg-slate-900 text-slate-300 text-xs py-1 px-4 sm:px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-950/80 text-red-300 font-semibold border border-red-800/50">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-            Google for Developers | H2S PromptWars × WIE-IEEE
-          </span>
-          <span className="hidden md:inline text-slate-400">
-            Multimodal Campus Health & Emergency Safety Companion
+      {/* Top Status & Emergency Helpline Bar */}
+      <div className="bg-slate-50 border-b border-slate-200/80 text-slate-700 text-xs py-1.5 px-4 sm:px-6 flex items-center justify-between">
+        <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold text-[11px] border border-emerald-300/80 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>24/7 Campus Emergency Network Active</span>
+          </div>
+          <span className="hidden sm:inline text-slate-300">|</span>
+          <span className="hidden md:flex items-center gap-1.5 text-slate-600 text-[11px]">
+            <span className="font-semibold text-slate-800">Direct SOS Hotline:</span>
+            <span className="font-mono font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.2 rounded">112</span>
           </span>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <div className="flex items-center gap-1 text-slate-400">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium">
             {isOnline ? (
-              <span className="flex items-center gap-1 text-emerald-400">
-                <Wifi className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Online</span>
+              <span className="flex items-center gap-1 text-emerald-700 font-medium">
+                <Wifi className="w-3.5 h-3.5 text-emerald-600" /> <span className="hidden sm:inline">Online</span>
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-amber-400">
-                <WifiOff className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Offline Mode</span>
+              <span className="flex items-center gap-1 text-amber-700 font-medium">
+                <WifiOff className="w-3.5 h-3.5 text-amber-600" /> <span className="hidden sm:inline">Offline Mode</span>
               </span>
             )}
           </div>
 
-          {/* Demo Scenarios Quick Launcher */}
+          {/* Guided Emergency Demos Quick Launcher */}
           <div className="relative">
             <button
               id="demo-scenarios-btn"
               onClick={() => setShowDemoMenu(!showDemoMenu)}
-              className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-medium transition"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs font-semibold text-xs transition active:scale-95"
             >
-              <Sparkles className="w-3 h-3 text-amber-300" />
-              <span>Judge Demos</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Interactive Scenarios</span>
             </button>
 
             {showDemoMenu && (
               <div
                 id="demo-scenarios-menu"
-                className="absolute right-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 text-slate-800"
+                className="absolute right-0 mt-1.5 w-80 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50 text-slate-800 animate-in fade-in zoom-in-95 duration-150"
               >
-                <div className="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Competition Scenarios
+                <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 flex items-center justify-between">
+                  <span>Interactive Test Scenarios</span>
+                  <span className="text-[10px] font-mono text-blue-600 font-medium">6 Presets</span>
                 </div>
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(1);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 flex items-start gap-2 border-b border-slate-100"
-                >
-                  <span className="text-base">🩹</span>
-                  <div>
-                    <div className="font-semibold text-slate-900">Demo 1: Minor Injury First-Aid</div>
-                    <div className="text-slate-500">Structured AI step-by-step guidance</div>
-                  </div>
-                </button>
 
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(2);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 flex items-start gap-2 border-b border-slate-100"
-                >
-                  <span className="text-base">⚡</span>
-                  <div>
-                    <div className="font-semibold text-slate-900">Demo 2: Image Hazard Vision</div>
-                    <div className="text-slate-500">Exposed high-voltage wire analysis</div>
-                  </div>
-                </button>
+                <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(11);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-slate-50 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">📱</span>
+                    <div>
+                      <div className="font-bold text-slate-900">1. Possible Fall Impact</div>
+                      <div className="text-slate-500 text-[11px]">Triggers the Guardian are-you-okay countdown</div>
+                    </div>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(3);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 flex items-start gap-2 border-b border-slate-100"
-                >
-                  <span className="text-base">🌐</span>
-                  <div>
-                    <div className="font-semibold text-slate-900">Demo 3: Multilingual Switch</div>
-                    <div className="text-slate-500">English → Hindi → Hinglish instructions</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(12);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-slate-50 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">🌎</span>
+                    <div>
+                      <div className="font-bold text-slate-900">2. Earthquake Warning Banner</div>
+                      <div className="text-slate-500 text-[11px]">Simulates a regional safety broadcast and safety instructions</div>
+                    </div>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(4);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-red-50 flex items-start gap-2 border-b border-slate-100"
-                >
-                  <span className="text-base">🚨</span>
-                  <div>
-                    <div className="font-semibold text-red-700">Demo 4: Critical Escalation</div>
-                    <div className="text-slate-500">Unconscious person → 112 Urgent Action</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(13);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-slate-50 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">🌊</span>
+                    <div>
+                      <div className="font-bold text-slate-900">3. Flood Warning Emergency</div>
+                      <div className="text-slate-500 text-[11px]">Simulates active flash flood warning indicators</div>
+                    </div>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(5);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 flex items-start gap-2 border-b border-slate-100"
-                >
-                  <span className="text-base">⚠️</span>
-                  <div>
-                    <div className="font-semibold text-slate-900">Demo 5: Sign Translator</div>
-                    <div className="text-slate-500">Warning sign OCR & local translation</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(14);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-red-50/70 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">🏥</span>
+                    <div>
+                      <div className="font-bold text-red-700">4. Critical Medical Triage</div>
+                      <div className="text-slate-500 text-[11px]">Symptom analysis and instant hospital mapping</div>
+                    </div>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    onSelectDemoScenario(6);
-                    setShowDemoMenu(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-slate-100 flex items-start gap-2"
-                >
-                  <span className="text-base">🧪</span>
-                  <div>
-                    <div className="font-semibold text-slate-900">Demo 6: Campus Hazard Report</div>
-                    <div className="text-slate-500">Chemical lab spill with GPS & photo</div>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(15);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-slate-50 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">⚡</span>
+                    <div>
+                      <div className="font-bold text-slate-900">5. Hazard Vision Detection</div>
+                      <div className="text-slate-500 text-[11px]">Frayed electrical wires Gemini analysis preset</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onSelectDemoScenario(16);
+                      setShowDemoMenu(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-slate-50 flex items-start gap-2.5 transition"
+                  >
+                    <span className="text-lg leading-none">👨‍⚕️</span>
+                    <div>
+                      <div className="font-bold text-slate-900">6. Clinical Doctor Summary</div>
+                      <div className="text-slate-500 text-[11px]">Converts Hinglish vocal reports into medical text summaries</div>
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -226,8 +281,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Desktop Navigation Tabs */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.slice(0, 7).map((item) => (
+          <nav className="hidden lg:flex items-center gap-0.5 max-w-full overflow-x-auto">
+            {navLinks.map((item) => (
               <button
                 key={item.id}
                 id={`nav-link-${item.id}`}
@@ -283,6 +338,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Hands-Free Voice Control Trigger */}
+            <button
+              id="hands-free-voice-toggle"
+              onClick={isVoiceListening ? stopVoiceCommandListener : startVoiceCommandListener}
+              title={isVoiceListening ? "Stop hands-free SOS monitor" : "Start hands-free SOS monitor (Say 'Help me')"}
+              className={`p-2 rounded-lg border text-xs transition flex items-center gap-1.5 font-bold ${
+                isVoiceListening
+                  ? 'bg-red-600 text-white border-red-700 animate-pulse shadow-xs'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              <span>🎙️</span>
+              <span className="hidden md:inline text-[11px]">
+                {isVoiceListening ? 'SOS ACTIVE' : 'VOICE SOS'}
+              </span>
+            </button>
 
             {/* Accessibility Quick Toggle */}
             <button

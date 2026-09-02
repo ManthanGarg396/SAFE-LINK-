@@ -185,6 +185,109 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </div>
       </div>
 
+      {/* NEW INTERACTIVE PERMISSION CENTER (settings/permissions) */}
+      <div className="rounded-2xl bg-white border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4" id="permission-center">
+        <div className="flex items-center gap-2 font-bold text-sm text-slate-900">
+          <ShieldCheck className="w-4 h-4 text-indigo-600" />
+          <span>Interactive Permission & Device Capability Center</span>
+        </div>
+        <p className="text-xs text-slate-500">
+          Manage system authorizations and see device integration status. Permissions are requested only when you trigger relevant features.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {/* Location */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-150 flex flex-col justify-between text-xs space-y-2">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900">📍 Geolocation API</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-150">
+                  Ready
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-normal mt-1">
+                Used strictly to find nearest hospitals and coordinates during critical SOS requests.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                navigator.geolocation.getCurrentPosition(() => alert('Location permission verified successfully!'));
+              }}
+              className="w-full text-center py-1.5 bg-white border border-slate-250 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Trigger Location Authorization
+            </button>
+          </div>
+
+          {/* Microphone */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-150 flex flex-col justify-between text-xs space-y-2">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900">🎙️ Microphone Input</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-150">
+                  Ready
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-normal mt-1">
+                Enables hands-free voice command emergency keywords and translation helper listening.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                navigator.mediaDevices?.getUserMedia?.({ audio: true }).then(() => alert('Microphone verification successful!'));
+              }}
+              className="w-full text-center py-1.5 bg-white border border-slate-250 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Request Microphone Access
+            </button>
+          </div>
+
+          {/* Camera */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-150 flex flex-col justify-between text-xs space-y-2">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900">📷 Device Camera</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-150">
+                  Ready
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-normal mt-1">
+                Power signs translation OCR scans and physical hazard detection feeds.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                navigator.mediaDevices?.getUserMedia?.({ video: true }).then(() => alert('Camera verification successful!'));
+              }}
+              className="w-full text-center py-1.5 bg-white border border-slate-250 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Test Camera Permission
+            </button>
+          </div>
+
+          {/* Motion Sensors */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-150 flex flex-col justify-between text-xs space-y-2">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900">📱 G-Sensor Motion</span>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-150">
+                  Active
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-normal mt-1">
+                Monitors rapid impact g-force thresholds for the Safe-Link Guardian fall warning systems.
+              </p>
+            </div>
+            <button
+              onClick={() => alert('Motion and Accelerometer streams are bound inside the Guardian console locally.')}
+              className="w-full text-center py-1.5 bg-white border border-slate-250 rounded text-[10px] font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Initialize Accelerometer Tracking
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Data Storage & Privacy */}
       <div className="rounded-2xl bg-white border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 font-bold text-sm text-slate-900">

@@ -52,13 +52,20 @@ export const HazardVisionPage: React.FC<HazardVisionPageProps> = ({
 
   useEffect(() => {
     StorageService.getHazards().then(setHazardsList);
-    LocationService.getCurrentLocation().then(setCoords).catch(console.warn);
 
     if (initialPreset) {
       setDescription(initialPreset.description);
       setCategory(initialPreset.category as any);
     }
   }, [initialPreset]);
+
+  const handleManualLocation = () => {
+    LocationService.getCurrentLocation()
+      .then(setCoords)
+      .catch((err) => {
+        alert(err.message || "Location access denied or unavailable.");
+      });
+  };
 
   const hazardPresets = [
     {
@@ -281,10 +288,17 @@ export const HazardVisionPage: React.FC<HazardVisionPageProps> = ({
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-red-600" />
               <span>
-                GPS: {coords ? LocationService.formatCoordinates(coords) : 'Detecting...'}
+                GPS: {coords ? LocationService.formatCoordinates(coords) : 'Not tagged'}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-mono">Auto-tagged</span>
+            {!coords && (
+              <button 
+                onClick={handleManualLocation}
+                className="px-2 py-1 rounded bg-white border border-slate-300 hover:bg-slate-100 text-[10px] font-bold text-slate-700 transition"
+              >
+                Tag Location
+              </button>
+            )}
           </div>
 
           {/* Action CTAs */}

@@ -43,6 +43,16 @@ export const PrivacyPage: React.FC = () => {
         <p>
           GPS coordinates are queried locally via the browser Geolocation API solely to assist responders when you choose to share your location.
         </p>
+
+        <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider pt-2">
+          4. Safe-Link Guardian & Wearable Privacy
+        </h2>
+        <p>
+          Safe-Link Guardian is completely <strong>disabled by default</strong>. Sensor readings, including device motion, orientation, and Bluetooth wearable heart-rate telemetry, are processed strictly inside your local device client memory. Safe-Link AI does NOT continuously stream raw sensory coordinates to any external cloud databases. 
+        </p>
+        <p>
+          If a possible fall impact or critical heart-rate anomaly is detected, the workflow runs a local confirmation countdown timer. All diagnostic files and summaries are kept offline and are only shared with emergency contacts or dispatchers when you explicitly confirm.
+        </p>
       </div>
     </div>
   );

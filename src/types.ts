@@ -120,4 +120,10 @@ export type AppTab =
   | 'history'
   | 'settings'
   | 'privacy'
-  | 'about';
+  | 'about'
+  | 'scan'
+  | 'admin'
+  | 'demo'
+  | 'guardian'
+  | 'medical'
+  | 'notifications';

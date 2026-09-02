@@ -10,6 +10,7 @@ import {
   UserCheck,
   ShieldCheck,
   Sparkles,
+  MapPin,
 } from 'lucide-react';
 import { EmergencyContact } from '../types.ts';
 import { StorageService } from '../services/storage.ts';
@@ -46,11 +47,17 @@ export const AlertContactModal: React.FC<AlertContactModalProps> = ({
         setSelectedContactIds(primaries.length > 0 ? primaries : stored.map((c) => c.id));
       });
 
-
-      LocationService.getCurrentLocation().then(setCoords).catch(console.warn);
       setDispatchStatus(null);
     }
   }, [isOpen]);
+
+  const handleManualLocation = () => {
+    LocationService.getCurrentLocation()
+      .then(setCoords)
+      .catch((err) => {
+        alert(err.message || "Location access denied or unavailable.");
+      });
+  };
 
   if (!isOpen) return null;
 
@@ -205,13 +212,24 @@ ${customNote ? `\nUser Note: ${customNote}` : ''}
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Generated Alert Message
               </label>
-              <button
-                onClick={handleCopy}
-                className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 hover:underline"
-              >
-                {copiedAlert ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedAlert ? 'Copied to clipboard!' : 'Copy message text'}</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {!coords && (
+                  <button
+                    onClick={handleManualLocation}
+                    className="text-[11px] text-amber-600 font-bold flex items-center gap-1 hover:underline"
+                  >
+                    <MapPin className="w-3 h-3" />
+                    <span>Include GPS</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleCopy}
+                  className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 hover:underline"
+                >
+                  {copiedAlert ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedAlert ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
             </div>
 
             <textarea
